@@ -3,9 +3,9 @@
 
 # Try to find daily returns from flagship or fallback
 daily_paths <- c(
-  "../../app-0001-nk-securities-quant-researcher/project-backtested-strategy-engine/results/daily_returns.csv",
+  "../../app-0001-nk-securities-quant-researcher/backtested-strategy-engine/results/daily_returns.csv",
   "../../app-0001-nk-securities-quant-researcher/project/results/daily_returns.csv",
-  "../app-0001-nk-securities-quant-researcher/project-backtested-strategy-engine/results/daily_returns.csv",
+  "../app-0001-nk-securities-quant-researcher/backtested-strategy-engine/results/daily_returns.csv",
   "../app-0001-nk-securities-quant-researcher/project/results/daily_returns.csv",
   "results_daily.csv"
 )

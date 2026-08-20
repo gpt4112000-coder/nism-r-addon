@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 ROOT = Path(__file__).parent.parent
 # absolute candidate from applications/ level (named folder first)
 CANDIDATES = [
-    ROOT.parent.parent / "app-0001-nk-securities-quant-researcher" / "project-backtested-strategy-engine" / "results" / "daily_returns.csv",
+    ROOT.parent.parent / "app-0001-nk-securities-quant-researcher" / "backtested-strategy-engine" / "results" / "daily_returns.csv",
     ROOT.parent.parent / "app-0001-nk-securities-quant-researcher" / "project" / "results" / "daily_returns.csv",
 ]
 DAILY = None

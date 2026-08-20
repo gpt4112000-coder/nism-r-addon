@@ -2,7 +2,8 @@
 
 **For:** Junior Quantitative Analyst, iRage Capital (GIFT City) — mandatory NISM certificate + R evidence.
 
-This project is two tracks: (1) bounded certification prep (highest ROI gap in `state/prep_plan.md:4`), (2) small R reimplementation proving R fluency without a standalone project.
+## Description
+A two-track project that pairs certification prep with a compact R demonstration. Track 1 is a structured study plan for NISM Series VIII Equity Derivatives (syllabus, registration, mock log) to meet a mandatory hiring requirement. Track 2 re-implements flagship backtest metrics (Sharpe, max drawdown, hit rate) in R and cross-checks them against Python, showing R fluency for a “preferred” tool without overstating expertise. Together they address both the credential gap and the tooling preference for the role.
 
 ## Part 1 — NISM Series VIII: Equity Derivatives (Mandatory)
 
@@ -60,10 +61,6 @@ This satisfies iRage’s “R preferred” without claiming standalone expertise
 ## Limitations
 - Not yet certified — folder tracks prep, not a claim. Do not add to resume until exam booked/passed.
 - R is minimal (one script) — sufficient for “preferred” not “expert”; expand only if R becomes core.
-
-## Interview prep
-- NISM: margins (SPAN vs exposure), settlement cycle (T+1), option exercise types.
-- “How did you close market-experience gap?” → point to flagship backtest + NISM in progress (30-second answer).
 
 ## Structure
 ```
