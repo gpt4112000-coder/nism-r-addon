@@ -44,10 +44,45 @@ cat(sprintf("Sharpe: %.4f (mean %.6f vol %.6f)\n", sharpe, mean_ret, vol))
 cat(sprintf("Max DD: %.4f  Hit rate: %.3f  Days: %d\n", max_dd, hit_rate, nrow(daily)))
 cat(sprintf("Equity start %.4f end %.4f total %.2f%%\n", equity[1], tail(equity,1), (tail(equity,1)-1)*100))
 
+# Newey-West significance test on mean daily return, mirroring
+# R/analysis.py::newey_west_mean_tstat -- a point-estimate Sharpe with no
+# significance/uncertainty attached is easy to over-read.
+if (!require("sandwich")) install.packages("sandwich", repos="https://cloud.r-project.org")
+if (!require("lmtest")) install.packages("lmtest", repos="https://cloud.r-project.org")
+library(sandwich); library(lmtest)
+n <- length(na.omit(daily$strategy_ret))
+maxlags <- floor(4 * (n/100)^(2/9))  # Newey-West (1994) rule of thumb, same as Python side
+fit <- lm(strategy_ret ~ 1, data=daily)
+nw_vcov <- vcovHAC(fit, lag=maxlags, type="HC0")
+nw_test <- coeftest(fit, vcov=nw_vcov)
+nw_t <- nw_test[1, "t value"]
+nw_p <- nw_test[1, "Pr(>|t|)"]
+cat(sprintf("Newey-West: t=%.3f p=%.3f significant=%s (maxlags=%d)\n", nw_t, nw_p, nw_p < 0.05, maxlags))
+
+# Block bootstrap 95% CI on Sharpe, mirroring
+# R/analysis.py::block_bootstrap_sharpe_ci
+set.seed(42)
+n_boot <- 2000
+block_size <- 10
+r <- na.omit(daily$strategy_ret)
+n_blocks <- ceiling(length(r) / block_size)
+boot_sharpes <- numeric(n_boot)
+for (b in 1:n_boot) {
+  starts <- sample(1:max(length(r) - block_size, 1), n_blocks, replace=TRUE)
+  sample_r <- unlist(lapply(starts, function(s) r[s:min(s+block_size-1, length(r))]))[1:length(r)]
+  mu <- mean(sample_r); sd_r <- sd(sample_r)
+  boot_sharpes[b] <- if (sd_r > 0) (mu/sd_r) * sqrt(252) else 0
+}
+ci_low <- quantile(boot_sharpes, 0.025)
+ci_high <- quantile(boot_sharpes, 0.975)
+cat(sprintf("Bootstrap 95%% CI on Sharpe: [%.3f, %.3f]\n", ci_low, ci_high))
+
 # Save
 dir.create("results", showWarnings=FALSE)
-res <- data.frame(metric=c("sharpe","max_drawdown","hit_rate","ann_return","ann_vol","days"),
-                  value=c(sharpe, max_dd, hit_rate, mean_ret*252, vol*sqrt(252), nrow(daily)))
+res <- data.frame(metric=c("sharpe","max_drawdown","hit_rate","ann_return","ann_vol","days",
+                            "nw_t_stat","nw_p_value","boot_ci_low","boot_ci_high"),
+                  value=c(sharpe, max_dd, hit_rate, mean_ret*252, vol*sqrt(252), nrow(daily),
+                          nw_t, nw_p, ci_low, ci_high))
 write.csv(res, "results/R_metrics.csv", row.names=FALSE)
 cat("[R] saved results/R_metrics.csv\n")
 

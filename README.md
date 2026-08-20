@@ -36,32 +36,49 @@ Update `resume_draft.tex` Certifications:
 and revise cover letter line from “prepared to complete” to concrete status.
 
 ## Part 2 — R Add-On (Small, opportunistic)
-Flagship’s Python performance metrics (Sharpe/drawdown) reimplemented in **R** as `R/analysis.R` + Python-verified version `R/analysis.py`.
+Flagship's Python performance metrics (Sharpe/drawdown) reimplemented in **R** as `R/analysis.R` + Python-verified version `R/analysis.py` — both now also compute a **Newey-West significance test** and a **block-bootstrap 95% CI on Sharpe**, not just the point estimate, matching the statistical standard used in the flagship project's own `src/stats.py`.
 
 Run:
 ```bash
-python3 R/analysis.py          # computes Sharpe/drawdown in Python (verifies R logic)
-Rscript R/analysis.R           # same in R (if R installed)
+python3 R/analysis.py          # Sharpe/DD + Newey-West + bootstrap CI, in Python
+Rscript R/analysis.R           # same in R (if R installed) -- see note below
+python3 -m pytest tests/ -v    # correctness tests for both stat utilities
 ```
-Outputs `R/results_metrics.json` + console table proving parity.
+
+### Current results (against flagship's live `daily_returns.csv`, 1711 days)
+| Metric | Value |
+|---|---|
+| Sharpe | -0.19 |
+| Max drawdown | -8.58% |
+| Hit rate | 49.0% |
+| Newey-West t-stat (mean daily return) | -0.54 |
+| Newey-West p-value | 0.590 (not significant) |
+| Bootstrap 95% CI on Sharpe | [-0.888, 0.514] |
+
+Consistent with the flagship project's own conclusion: no statistically detectable edge on synthetic data. This script re-derives that finding independently (reading the same `daily_returns.csv`, but computing its own Sharpe/NW/bootstrap from scratch) rather than just quoting the flagship number, which is what actually demonstrates R/Python parity rather than assuming it.
 
 ### R evidence snippet
 ```r
-# R/analysis.R — Sharpe/drawdown from daily returns
-daily <- read.csv("results_daily.csv")
-sharpe <- mean(daily$ret) / sd(daily$ret) * sqrt(252)
-running_max <- cummax(cumprod(1+daily$ret))
-drawdown <- (cumprod(1+daily$ret) - running_max) / running_max
+# R/analysis.R — Sharpe/drawdown + Newey-West + bootstrap CI, same formulas as Python
+daily <- read.csv("daily_returns.csv")
+sharpe <- mean(daily$strategy_ret) / sd(daily$strategy_ret) * sqrt(252)
+fit <- lm(strategy_ret ~ 1, data=daily)
+nw_test <- coeftest(fit, vcov=vcovHAC(fit, lag=maxlags, type="HC0"))  # sandwich/lmtest
 ```
 
-This demonstrates R fluency for a “preferred” tool without claiming standalone expertise — honest and interview-defensible.
+This demonstrates R fluency for a "preferred" tool without claiming standalone expertise — honest and interview-defensible, and now includes the same statistical rigor (not just point estimates) as the rest of this repo's projects.
+
+## Tests (`tests/test_analysis.py`)
+3 pytest cases: Newey-West correctly rejects a clearly-nonzero mean; the false-positive *rate* across 200 independent pure-noise draws is checked against the nominal ~5% (a single noise draw asserting "not significant" is itself flaky by design — ~1 in 20 will spuriously reject, so the rate is tested, not one draw); bootstrap CI bounds are ordered and finite.
 
 ## Limitations
 - Not yet certified — folder tracks prep, not a claim. Do not add to resume until exam booked/passed.
-- R is minimal (one script) — sufficient for “preferred” not “expert”; expand only if R becomes core.
+- R is minimal (two scripts) — sufficient for "preferred" not "expert"; expand only if R becomes core.
+- `R/analysis.R` was updated to match `R/analysis.py`'s logic exactly but **hasn't been executed in this sandbox** (no R interpreter available here) — treat it as unverified-but-code-reviewed until run once with `Rscript`, same caveat as `app-0004-.../R/analysis.R`.
 
 ## Structure
 ```
 nism/study_plan.md  nism/mock_test_log.csv  nism/workbook_notes.md
 R/analysis.R  R/analysis.py  R/README.md
+tests/test_analysis.py
 ```
