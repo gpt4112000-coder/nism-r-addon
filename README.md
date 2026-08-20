@@ -1,14 +1,12 @@
 # NISM Certification + R Add-On
 
-**For:** Junior Quantitative Analyst, iRage Capital (GIFT City) — mandatory NISM certificate + R evidence.
-
 ## Description
 A two-track project that pairs certification prep with a compact R demonstration. Track 1 is a structured study plan for NISM Series VIII Equity Derivatives (syllabus, registration, mock log) to meet a mandatory hiring requirement. Track 2 re-implements flagship backtest metrics (Sharpe, max drawdown, hit rate) in R and cross-checks them against Python, showing R fluency for a “preferred” tool without overstating expertise. Together they address both the credential gap and the tooling preference for the role.
 
 ## Part 1 — NISM Series VIII: Equity Derivatives (Mandatory)
 
 ### Identify the module
-iRage is a securities-markets HFT/prop firm; the posting's likely requirement is **NISM Series VIII – Equity Derivatives** (covers futures/options, margins, settlement, regulations) — confirm with recruiter if possible; Series VIII is the standard ask for junior quant/derivatives roles. Alternative: Series I (Currency Derivatives) if FX-heavy, but VIII is safest default.
+Securities-markets roles often require **NISM Series VIII – Equity Derivatives** (covers futures/options, margins, settlement, regulations). Series VIII is the standard for junior quant/derivatives roles; Series I (Currency Derivatives) is the alternative if the focus is FX. Confirm the specific module with the recruiter if possible.
 
 ### Registration (self-study, computer-based)
 1. Create account at https://www.nism.ac.in → Certifications → Register.
@@ -56,7 +54,7 @@ running_max <- cummax(cumprod(1+daily$ret))
 drawdown <- (cumprod(1+daily$ret) - running_max) / running_max
 ```
 
-This satisfies iRage’s “R preferred” without claiming standalone expertise — honest, interview-defensible.
+This demonstrates R fluency for a “preferred” tool without claiming standalone expertise — honest and interview-defensible.
 
 ## Limitations
 - Not yet certified — folder tracks prep, not a claim. Do not add to resume until exam booked/passed.
